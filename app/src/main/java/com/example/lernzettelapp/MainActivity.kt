@@ -37,6 +37,7 @@ fun AppNavigation(
 ) {
     val navController = rememberNavController()
     val studyNotes by viewModel.studyNotes.collectAsState()
+    val isRefreshing by viewModel.isRefreshing.collectAsState()
     val currentUser by authViewModel.currentUser.collectAsState()
 
     LaunchedEffect(currentUser) {
@@ -66,6 +67,8 @@ fun AppNavigation(
         composable("notes") {
             StudyNotesScreen(
                 notes = studyNotes,
+                isRefreshing = isRefreshing,
+                onRefresh = { viewModel.refresh() },
                 onAddNote = { navController.navigate("edit_note") },
                 onEditNote = { note -> navController.navigate("edit_note/${note.id}") },
                 onDeleteNote = { note -> viewModel.deleteStudyNote(note.id) },

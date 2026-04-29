@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "488095938572",
+    "project_id": "lernzettel-app-855c8",
+    "storage_bucket": "lernzettel-app-855c8.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:488095938572:android:7af6bc2ef89650b8755629",
+        "android_client_info": {
+          "package_name": "com.example.lernzettelapp"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDzZRrL5584tJhP7hb3iOCvmeMG-8rx1Nw"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

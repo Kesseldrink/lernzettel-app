@@ -17,6 +17,8 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ExitToApp
 import androidx.compose.material.icons.filled.*
 import androidx.compose.material3.*
+import androidx.compose.material3.pulltorefresh.PullToRefreshBox
+import androidx.compose.material3.pulltorefresh.rememberPullToRefreshState
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -37,6 +39,23 @@ import com.example.lernzettelapp.utils.PdfGenerator
 @Composable
 fun StudyNotesScreen(
     notes: List<StudyNote>,
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+    isRefreshing: Boolean,
+    onRefresh: () -> Unit,
     onAddNote: () -> Unit,
     onEditNote: (StudyNote) -> Unit,
     onDeleteNote: (StudyNote) -> Unit,
@@ -225,19 +244,25 @@ fun StudyNotesScreen(
                     }
                 }
 
-                LazyColumn(
+                PullToRefreshBox(
+                    isRefreshing = isRefreshing,
+                    onRefresh = onRefresh,
                     modifier = Modifier.fillMaxSize()
                 ) {
-                    items(filteredNotes) { note ->
-                        NoteItem(
-                            note = note,
-                            isSelected = selectedNoteId == note.id,
-                            onToggleSelection = {
-                                selectedNoteId = if (selectedNoteId == note.id) null else note.id
-                            },
-                            onEdit = { onEditNote(note) },
-                            onDelete = { onDeleteNote(note) }
-                        )
+                    LazyColumn(
+                        modifier = Modifier.fillMaxSize()
+                    ) {
+                        items(filteredNotes) { note ->
+                            NoteItem(
+                                note = note,
+                                isSelected = selectedNoteId == note.id,
+                                onToggleSelection = {
+                                    selectedNoteId = if (selectedNoteId == note.id) null else note.id
+                                },
+                                onEdit = { onEditNote(note) },
+                                onDelete = { onDeleteNote(note) }
+                            )
+                        }
                     }
                 }
             }

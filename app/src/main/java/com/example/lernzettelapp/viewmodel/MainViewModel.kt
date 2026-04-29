@@ -5,7 +5,9 @@ import androidx.lifecycle.viewModelScope
 import com.example.lernzettelapp.model.*
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
+import com.google.firebase.firestore.ListenerRegistration
 import com.google.firebase.firestore.Query
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -14,28 +16,57 @@ import kotlinx.coroutines.launch
 class MainViewModel : ViewModel() {
     private val db = FirebaseFirestore.getInstance()
     private val auth = FirebaseAuth.getInstance()
+    private var notesListener: ListenerRegistration? = null
     
     private val _studyNotes = MutableStateFlow<List<StudyNote>>(emptyList())
     val studyNotes: StateFlow<List<StudyNote>> = _studyNotes.asStateFlow()
 
+    private val _isRefreshing = MutableStateFlow(false)
+    val isRefreshing: StateFlow<Boolean> = _isRefreshing.asStateFlow()
+
     init {
-        observeNotes()
+        auth.addAuthStateListener { firebaseAuth ->
+            val userId = firebaseAuth.currentUser?.uid
+            if (userId != null) {
+                observeNotes(userId)
+            } else {
+                notesListener?.remove()
+                _studyNotes.value = emptyList()
+            }
+        }
     }
 
-    private fun observeNotes() {
-        val userId = auth.currentUser?.uid ?: return
-        db.collection("users").document(userId).collection("notes")
-            .orderBy("id", Query.Direction.DESCENDING)
+    fun refresh() {
+        viewModelScope.launch {
+            _isRefreshing.value = true
+            val userId = auth.currentUser?.uid
+            if (userId != null) {
+                observeNotes(userId)
+            }
+            delay(1000) // Kleine Verzögerung für das UI-Feeling
+            _isRefreshing.value = false
+        }
+    }
+
+    private fun observeNotes(userId: String) {
+        notesListener?.remove()
+        
+        notesListener = db.collection("users").document(userId).collection("notes")
             .addSnapshotListener { snapshot, e ->
                 if (e != null || snapshot == null) return@addSnapshotListener
                 
                 val notes = snapshot.documents.mapNotNull { doc ->
                     try {
+                        val tagStr = doc.getString("tag") ?: SubjectTag.DEUTSCH.name
+                        // Robustes Mapping für Tags (case-insensitive)
+                        val tag = SubjectTag.entries.find { it.name.equals(tagStr, ignoreCase = true) || it.label.equals(tagStr, ignoreCase = true) } 
+                                 ?: SubjectTag.DEUTSCH
+
                         StudyNote(
                             id = doc.getString("id") ?: doc.id,
                             title = doc.getString("title") ?: "",
                             content = doc.getString("content") ?: "",
-                            tag = SubjectTag.valueOf(doc.getString("tag") ?: SubjectTag.DEUTSCH.name),
+                            tag = tag,
                             isDeleted = doc.getBoolean("isDeleted") ?: false,
                             isFinished = doc.getBoolean("isFinished") ?: false
                         )
@@ -45,6 +76,11 @@ class MainViewModel : ViewModel() {
                 }
                 _studyNotes.value = notes
             }
+    }
+
+    override fun onCleared() {
+        super.onCleared()
+        notesListener?.remove()
     }
 
     fun addStudyNote(title: String, content: String, tag: SubjectTag) {
