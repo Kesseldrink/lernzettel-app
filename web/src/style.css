@@ -1,0 +1,147 @@
+:root {
+  --dark-bg: #12121a;
+  --glass-surface: rgba(255, 255, 255, 0.1);
+  --glass-border: rgba(255, 255, 255, 0.2);
+  --text-white: #ffffff;
+}
+
+body {
+  background: linear-gradient(180deg, var(--dark-bg) 0%, #1a1a2e 100%);
+  color: var(--text-white);
+  font-family: 'Inter', sans-serif;
+  min-height: 100vh;
+  margin: 0;
+}
+
+.glass {
+  background: var(--glass-surface);
+  backdrop-filter: blur(10px);
+  border: 1px solid var(--glass-border);
+  border-radius: 12px;
+}
+
+.auth-screen {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100vh;
+}
+
+.auth-container {
+  padding: 2rem;
+  width: 100%;
+  max-width: 400px;
+  text-align: center;
+}
+
+input, textarea, select {
+  width: 100%;
+  padding: 12px;
+  margin: 8px 0;
+  background: var(--glass-surface);
+  border: 1px solid var(--glass-border);
+  border-radius: 8px;
+  color: white;
+  box-sizing: border-box;
+}
+
+button {
+  padding: 12px 24px;
+  margin: 8px;
+  border-radius: 8px;
+  border: none;
+  background: rgba(255, 255, 255, 0.1);
+  color: white;
+  cursor: pointer;
+  transition: background 0.3s;
+}
+
+button:hover {
+  background: rgba(255, 255, 255, 0.2);
+}
+
+.app-container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 20px;
+}
+
+header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 1rem 2rem;
+  margin-bottom: 2rem;
+}
+
+#posts {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+  gap: 20px;
+}
+
+.card {
+  padding: 20px;
+}
+
+.tag {
+  display: inline-block;
+  padding: 4px 8px;
+  border-radius: 4px;
+  font-size: 0.8rem;
+  margin-top: 10px;
+}
+
+/* Fach-Farben */
+.tag.Deutsch { background: #ff4444; }
+.tag.Englisch { background: #4444ff; }
+.tag.Mathe { background: #ffff44; color: black; }
+.tag.Spanisch { background: #ffc0cb; color: black; }
+.tag.Physik { background: #8b4513; }
+.tag.Informatik { background: #808080; }
+.tag.Bio { background: #44ff44; color: black; }
+.tag.Geo { background: #ffa500; color: black; }
+.tag.Geschichte { background: #800080; }
+
+.fab {
+  position: fixed;
+  bottom: 30px;
+  right: 30px;
+  width: 60px;
+  height: 60px;
+  border-radius: 50%;
+  font-size: 24px;
+  background: rgba(255, 255, 255, 0.3);
+}
+
+.modal {
+  position: fixed;
+  top: 0; left: 0; width: 100%; height: 100%;
+  background: rgba(0,0,0,0.8);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.hidden { display: none; }
+
+.modal-content {
+  width: 90%;
+  max-width: 800px;
+  padding: 2rem;
+}
+
+.editor-container {
+  display: flex;
+  gap: 20px;
+  height: 300px;
+}
+
+textarea { height: 100%; resize: none; }
+#preview {
+  flex: 1;
+  padding: 12px;
+  border: 1px solid var(--glass-border);
+  border-radius: 8px;
+  overflow-y: auto;
+}
