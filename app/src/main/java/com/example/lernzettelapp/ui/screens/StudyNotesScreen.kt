@@ -1,14 +1,7 @@
 package com.example.lernzettelapp.ui.screens
 
-import androidx.compose.animation.AnimatedVisibility
-import androidx.compose.animation.animateContentSize
-import androidx.compose.animation.fadeIn
-import androidx.compose.animation.fadeOut
-import androidx.compose.foundation.BorderStroke
-import androidx.compose.foundation.ExperimentalFoundationApi
-import androidx.compose.foundation.background
-import androidx.compose.foundation.border
-import androidx.compose.foundation.combinedClickable
+import androidx.compose.animation.*
+import androidx.compose.foundation.*
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyRow
@@ -27,6 +20,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextDecoration
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import com.example.lernzettelapp.model.StudyNote
 import com.example.lernzettelapp.model.SubjectTag
@@ -83,6 +77,8 @@ fun StudyNotesScreen(
     val selectedNote = remember(selectedNoteId, notes) {
         notes.find { it.id == selectedNoteId }
     }
+
+    var showDetailDialog by remember { mutableStateOf<StudyNote?>(null) }
 
     Box(
         modifier = Modifier
@@ -250,7 +246,8 @@ fun StudyNotesScreen(
                     modifier = Modifier.fillMaxSize()
                 ) {
                     LazyColumn(
-                        modifier = Modifier.fillMaxSize()
+                        modifier = Modifier.fillMaxSize(),
+                        contentPadding = PaddingValues(bottom = 80.dp)
                     ) {
                         items(filteredNotes) { note ->
                             NoteItem(
@@ -260,13 +257,49 @@ fun StudyNotesScreen(
                                     selectedNoteId = if (selectedNoteId == note.id) null else note.id
                                 },
                                 onEdit = { onEditNote(note) },
-                                onDelete = { onDeleteNote(note) }
+                                onDelete = { onDeleteNote(note) },
+                                onClick = { showDetailDialog = note }
                             )
                         }
                     }
                 }
             }
         }
+    }
+
+    // Detail Dialog für Vollansicht
+    if (showDetailDialog != null) {
+        AlertDialog(
+            onDismissRequest = { showDetailDialog = null },
+            confirmButton = {
+                Row {
+                    TextButton(onClick = {
+                        PdfGenerator(context, showDetailDialog!!).print()
+                    }) {
+                        Icon(Icons.Default.Share, contentDescription = null, modifier = Modifier.size(18.dp))
+                        Spacer(Modifier.width(8.dp))
+                        Text("PDF", color = Color.White)
+                    }
+                    TextButton(onClick = { showDetailDialog = null }) {
+                        Text("Schließen", color = Color.White)
+                    }
+                }
+            },
+            title = {
+                Row(verticalAlignment = Alignment.CenterVertically) {
+                    Box(modifier = Modifier.size(12.dp).background(showDetailDialog!!.tag.color, MaterialTheme.shapes.small))
+                    Spacer(Modifier.width(8.dp))
+                    Text(showDetailDialog!!.title, color = Color.White)
+                }
+            },
+            text = {
+                Column(modifier = Modifier.verticalScroll(rememberScrollState())) {
+                    Text(showDetailDialog!!.content, color = Color.White.copy(alpha = 0.8f))
+                }
+            },
+            containerColor = Color(0xFF1A1A2E),
+            shape = MaterialTheme.shapes.large
+        )
     }
 }
 
@@ -277,19 +310,16 @@ fun NoteItem(
     isSelected: Boolean,
     onToggleSelection: () -> Unit,
     onEdit: () -> Unit, 
-    onDelete: () -> Unit
+    onDelete: () -> Unit,
+    onClick: () -> Unit
 ) {
-    var expanded by remember { mutableStateOf(false) }
-
     Card(
         modifier = Modifier
             .fillMaxWidth()
+            .height(150.dp) // Noch etwas kompakter
             .padding(horizontal = 16.dp, vertical = 8.dp)
-            .animateContentSize()
             .combinedClickable(
-                onClick = { 
-                    if (!isSelected) expanded = !expanded 
-                },
+                onClick = onClick,
                 onDoubleClick = onToggleSelection,
                 onLongClick = onToggleSelection
             ),
@@ -309,51 +339,34 @@ fun NoteItem(
             ) {
                 Box(
                     modifier = Modifier
-                        .size(12.dp)
+                        .size(10.dp)
                         .background(note.tag.color, shape = MaterialTheme.shapes.small)
                 )
-                Spacer(modifier = Modifier.width(16.dp))
+                Spacer(modifier = Modifier.width(12.dp))
                 Column(modifier = Modifier.weight(1f)) {
                     Text(
                         text = note.title, 
                         fontWeight = FontWeight.Bold, 
                         color = Color.White,
+                        maxLines = 1,
                         textDecoration = if (note.isFinished) TextDecoration.LineThrough else null
-                    )
-                    Text(
-                        text = note.tag.label,
-                        style = MaterialTheme.typography.bodySmall,
-                        color = Color.White.copy(alpha = 0.7f)
                     )
                 }
                 
-                if (note.isFinished) {
-                    Icon(
-                        Icons.Default.CheckCircle, 
-                        contentDescription = "Erledigt", 
-                        tint = Color.Green,
-                        modifier = Modifier.padding(end = 8.dp)
-                    )
-                }
-
                 IconButton(onClick = onDelete) {
                     Icon(Icons.Default.Delete, contentDescription = "Löschen", tint = Color.White.copy(alpha = 0.5f))
                 }
             }
 
-            AnimatedVisibility(visible = expanded) {
-                Column {
-                    HorizontalDivider(
-                        modifier = Modifier.padding(vertical = 12.dp),
-                        color = GlassBorder
-                    )
-                    Text(
-                        text = note.content,
-                        color = Color.White.copy(alpha = 0.9f),
-                        style = MaterialTheme.typography.bodyMedium
-                    )
-                }
-            }
+            Spacer(modifier = Modifier.height(4.dp))
+            
+            Text(
+                text = note.content,
+                color = Color.White.copy(alpha = 0.6f),
+                style = MaterialTheme.typography.bodySmall,
+                maxLines = 3,
+                overflow = TextOverflow.Ellipsis
+            )
         }
     }
 }

@@ -45,6 +45,11 @@ input, textarea, select {
   box-sizing: border-box;
 }
 
+select option {
+  background-color: #1a1a2e;
+  color: white;
+}
+
 button {
   padding: 12px 24px;
   margin: 8px;
@@ -93,15 +98,15 @@ header {
 }
 
 /* Fach-Farben */
-.tag.Deutsch { background: #ff4444; }
-.tag.Englisch { background: #4444ff; }
-.tag.Mathe { background: #ffff44; color: black; }
-.tag.Spanisch { background: #ffc0cb; color: black; }
-.tag.Physik { background: #8b4513; }
-.tag.Informatik { background: #808080; }
-.tag.Bio { background: #44ff44; color: black; }
-.tag.Geo { background: #ffa500; color: black; }
-.tag.Geschichte { background: #800080; }
+.tag.Deutsch, .tag.DEUTSCH { background: #ff4444; color: white; }
+.tag.Englisch, .tag.ENGLISCH { background: #4444ff; color: white; }
+.tag.Mathe, .tag.MATHE { background: #ffff44; color: black; }
+.tag.Spanisch, .tag.SPANISCH { background: #ffc0cb; color: black; }
+.tag.Physik, .tag.PHYSIK { background: #8b4513; color: white; }
+.tag.Informatik, .tag.INFORMATIK { background: #808080; color: white; }
+.tag.Bio, .tag.BIO { background: #44ff44; color: black; }
+.tag.Geo, .tag.GEO { background: #ffa500; color: black; }
+.tag.Geschichte, .tag.GESCHICHTE { background: #800080; color: white; }
 
 .fab {
   position: fixed;
